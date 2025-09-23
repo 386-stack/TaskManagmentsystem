@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK_HOME'          // Replace with your Jenkins JDK tool name
-        maven 'MAVEN_HOME'       // Replace with your Jenkins Maven tool name
-        nodejs 'NODE_HOME'     // Replace with your Jenkins NodeJS tool name
+        jdk 'JAVA'          // Replace with your Jenkins JDK tool name
+        maven 'MAVEN'       // Replace with your Jenkins Maven tool name
+        nodejs 'NODEJS'     // Replace with your Jenkins NodeJS tool name
     }
 
     environment {
         BACKEND_DIR = 'BACKEND/TASKMANAGMENTSYSTEM'
         FRONTEND_DIR = 'FRONTEND/TASKMANAGMENTSYSTEMFRONTEND'
-        GIT_REPO = 'https://github.com/386-stack/TaskManagmentsystem.git'  // Replace after pushing
+        GIT_REPO = 'YOUR_GITHUB_REPO_URL'  // Replace after pushing
         TOMCAT_URL = 'http://184.72.122.226:9090/manager/text'
         TOMCAT_CREDENTIALS = credentials('tomcat-creds')
         BACKEND_WAR = 'backendtaskmanagementsystem.war'
@@ -90,6 +90,7 @@ pipeline {
         }
 
         always {
+            // Cleanup WAR files after build
             bat '''
             if exist "%BACKEND_WAR%" del /Q "%BACKEND_WAR%" 2>nul
             if exist "%FRONTEND_WAR%" del /Q "%FRONTEND_WAR%" 2>nul
