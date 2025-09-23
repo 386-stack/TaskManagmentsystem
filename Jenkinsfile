@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JAVA'          // Replace with your Jenkins JDK tool name
-        maven 'MAVEN'       // Replace with your Jenkins Maven tool name
-        nodejs 'NODEJS'     // Replace with your Jenkins NodeJS tool name
+        jdk 'JDK_HOME'          // Replace with your Jenkins JDK tool name
+        maven 'MAVEN_HOME'       // Replace with your Jenkins Maven tool name
+        nodejs 'NODE_HOME'     // Replace with your Jenkins NodeJS tool name
     }
 
     environment {
