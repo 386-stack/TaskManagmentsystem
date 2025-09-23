@@ -11,7 +11,7 @@ pipeline {
         BACKEND_DIR = 'BACKEND/TASKMANAGMENTSYSTEM'
         FRONTEND_DIR = 'FRONTEND/TASKMANAGMENTSYSTEMFRONTEND'
         GIT_REPO = 'https://github.com/386-stack/TaskManagmentsystem.git'  // Replace after pushing
-        TOMCAT_URL = 'http://10.136.68.220:9090/manager/text/manager/text'
+        TOMCAT_URL = 'http://10.143.1.1:9090/manager/text/manager/text'
         TOMCAT_CREDENTIALS = credentials('tomcat-creds')
         BACKEND_WAR = 'backendtaskmanagementsystem.war'
         FRONTEND_WAR = 'frontendtaskmanagementsystem.war'
@@ -81,8 +81,8 @@ pipeline {
     post {
         success {
             echo "✅ Deployment Successful!"
-            echo "Backend URL: http://10.136.68.220:9090/manager/text/backendtaskmanagementsystem"
-            echo "Frontend URL: http://10.136.68.220:9090/manager/text/frontendtaskmanagementsystem"
+            echo "Backend URL: http://10.143.1.1:9090/manager/text/backendtaskmanagementsystem"
+            echo "Frontend URL: http://10.143.1.1:9090/manager/text/frontendtaskmanagementsystem"
         }
 
         failure {
