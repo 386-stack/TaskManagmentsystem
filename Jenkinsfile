@@ -10,7 +10,7 @@ pipeline {
     environment {
         BACKEND_DIR = 'BACKEND/TASKMANAGMENTSYSTEM'
         FRONTEND_DIR = 'FRONTEND/TASKMANAGMENTSYSTEMFRONTEND'
-        GIT_REPO = 'YOUR_GITHUB_REPO_URL'  // Replace after pushing
+        GIT_REPO = 'https://github.com/386-stack/TaskManagmentsystem.git'  // Replace after pushing
         TOMCAT_URL = 'http://184.72.122.226:9090/manager/text'
         TOMCAT_CREDENTIALS = credentials('tomcat-creds')
         BACKEND_WAR = 'backendtaskmanagementsystem.war'
