@@ -1,28 +1,32 @@
 pipeline {
     agent any
+
     tools {
-        jdk 'JDK_HOME'
-        maven 'MAVEN_HOME'
+        jdk 'JDK_HOME'          // Replace with your Jenkins JDK tool name
+        maven 'MAVEN_HOME'       // Replace with your Jenkins Maven tool name
+        nodejs 'NODE_HOME'     // Replace with your Jenkins NodeJS tool name
     }
+
     environment {
         BACKEND_DIR = 'BACKEND/TASKMANAGMENTSYSTEM'
-        FRONTEND_DIR = 'FRONTEND'
+        FRONTEND_DIR = 'FRONTEND/TASKMANAGMENTSYSTEMFRONTEND'
+        GIT_REPO = 'https://github.com/386-stack/TaskManagmentsystem.git'  // Replace after pushing
+        TOMCAT_URL = 'http://10.136.68.220:9090/manager/text/manager/text'
+        TOMCAT_CREDENTIALS = credentials('tomcat-creds')
         BACKEND_WAR = 'backendtaskmanagementsystem.war'
         FRONTEND_WAR = 'frontendtaskmanagementsystem.war'
     }
+
     stages {
+
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/386-stack/TaskManagmentsystem.git'
+                git branch: 'main', url: "${env.GIT_REPO}"
             }
         }
 
-        stage('Build Frontend') {
+        stage('Build Frontend (Vite)') {
             steps {
-                script {
-                    def nodeHome = tool name: 'NODE_HOME', type: 'NodeJS'
-                    env.PATH = "${nodeHome};${env.PATH}"
-                }
                 dir("${env.FRONTEND_DIR}") {
                     bat 'npm install'
                     bat 'npm run build'
@@ -44,28 +48,32 @@ pipeline {
             }
         }
 
-        stage('Build Backend') {
+        stage('Build Backend (Spring Boot WAR)') {
             steps {
                 dir("${env.BACKEND_DIR}") {
                     bat 'mvn clean package'
-                    bat 'copy target\\%BACKEND_WAR% ..\\..\\%BACKEND_WAR%'
+                    bat 'copy target\\backendtaskmanagementsystem.war ..\\..\\%BACKEND_WAR%'
                 }
             }
         }
 
         stage('Deploy Backend to Tomcat') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'tomcat-creds', path: '/backendtaskmanagementsystem', url: 'http://localhost:9090')],
-                       contextPath: '/backendtaskmanagementsystem',
-                       war: "${env.BACKEND_WAR}"
+                bat '''
+                curl -u %TOMCAT_CREDENTIALS_USR%:%TOMCAT_CREDENTIALS_PSW% ^
+                    --upload-file "%BACKEND_WAR%" ^
+                    "%TOMCAT_URL%/deploy?path=/backendtaskmanagementsystem&update=true" || exit /b 1
+                '''
             }
         }
 
         stage('Deploy Frontend to Tomcat') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'tomcat-creds', path: '/frontendtaskmanagementsystem', url: 'http://localhost:9090')],
-                       contextPath: '/frontendtaskmanagementsystem',
-                       war: "${env.FRONTEND_WAR}"
+                bat '''
+                curl -u %TOMCAT_CREDENTIALS_USR%:%TOMCAT_CREDENTIALS_PSW% ^
+                    --upload-file "%FRONTEND_WAR%" ^
+                    "%TOMCAT_URL%/deploy?path=/frontendtaskmanagementsystem&update=true" || exit /b 1
+                '''
             }
         }
     }
@@ -73,11 +81,16 @@ pipeline {
     post {
         success {
             echo "✅ Deployment Successful!"
+            echo "Backend URL: http://10.136.68.220:9090/manager/text/backendtaskmanagementsystem"
+            echo "Frontend URL: http://10.136.68.220:9090/manager/text/frontendtaskmanagementsystem"
         }
+
         failure {
-            echo "❌ Deployment Failed!"
+            echo "❌ Deployment Failed! Check logs."
         }
+
         always {
+            // Cleanup WAR files after build
             bat '''
             if exist "%BACKEND_WAR%" del /Q "%BACKEND_WAR%" 2>nul
             if exist "%FRONTEND_WAR%" del /Q "%FRONTEND_WAR%" 2>nul
